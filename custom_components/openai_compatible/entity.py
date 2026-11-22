@@ -695,6 +695,17 @@ class OpenAIBaseLLMEntity(Entity):
         # To prevent infinite loops, we limit the number of iterations
         for _iteration in range(max_iterations):
             try:
+                LOGGER.warning(
+                    "OpenAI input structure: %s",
+                    [
+                        {
+                            "type": item.get("type"),
+                            "role": item.get("role"),
+                            "content_type": type(item.get("content")).__name__,
+                        }
+                        for item in model_args["input"]
+                    ],
+                )
                 stream = await client.responses.create(**model_args)
 
                 content_stream = chat_log.async_add_delta_content_stream(
