@@ -323,6 +323,16 @@ async def _transform_stream(  # noqa: C901 - This is complex, but better to have
                     )
                 }
                 last_summary_index = len(event.item.summary) - 1
+            elif isinstance(event.item, ResponseFunctionToolCall):
+                yield {
+                    "tool_calls": [
+                        llm.ToolInput(
+                            id=event.item.call_id,
+                            tool_name=event.item.name,
+                            tool_args=json.loads(event.item.arguments),
+                        )
+                    ]
+                }
             elif isinstance(event.item, ResponseCodeInterpreterToolCall):
                 yield {
                     "tool_calls": [
