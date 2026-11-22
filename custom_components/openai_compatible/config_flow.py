@@ -58,6 +58,9 @@ from .const import (
     CONF_TEMPERATURE,
     CONF_TOP_P,
     CONF_TTS_SPEED,
+    CONF_TTS_RESPONSE_FORMAT,
+    DEFAULT_TTS_RESPONSE_FORMAT,
+    SUPPORTED_TTS_RESPONSE_FORMATS,
     CONF_VERBOSITY,
     CONF_WEB_SEARCH,
     CONF_WEB_SEARCH_CITY,
@@ -877,6 +880,18 @@ class OpenAISubentryTTSFlowHandler(ConfigSubentryFlow):
                 vol.Optional(
                     CONF_TTS_SPEED, default=RECOMMENDED_TTS_SPEED
                 ): NumberSelector(NumberSelectorConfig(min=0.25, max=4.0, step=0.01)),
+                vol.Optional(
+                    CONF_TTS_RESPONSE_FORMAT,
+                    default=options.get(
+                        CONF_TTS_RESPONSE_FORMAT,
+                        DEFAULT_TTS_RESPONSE_FORMAT,
+                    ),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=SUPPORTED_TTS_RESPONSE_FORMATS,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
             }
         )
 

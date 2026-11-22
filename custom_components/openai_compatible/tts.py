@@ -20,7 +20,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import CONF_CHAT_MODEL, CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED
+from .const import CONF_CHAT_MODEL, CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED, DEFAULT_TTS_RESPONSE_FORMAT, CONF_TTS_RESPONSE_FORMAT
 from .entity import OpenAIBaseLLMEntity
 
 if TYPE_CHECKING:
@@ -158,7 +158,10 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
         """Return a mapping with the default options."""
         return {
             ATTR_VOICE: self._supported_voices[0].voice_id,
-            ATTR_PREFERRED_FORMAT: "mp3",
+            ATTR_PREFERRED_FORMAT: self.subentry.data.get(
+                CONF_TTS_RESPONSE_FORMAT,
+                DEFAULT_TTS_RESPONSE_FORMAT
+            ),
         }
 
     @override

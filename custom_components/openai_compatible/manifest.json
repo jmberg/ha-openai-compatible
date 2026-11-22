@@ -6,16 +6,16 @@
     "intent"
   ],
   "codeowners": [
-    "@adamjs83"
+    "@jmberg"
   ],
   "config_flow": true,
   "dependencies": [
     "conversation"
   ],
-  "documentation": "https://github.com/adamjs83/ha-openai-compatible",
+  "documentation": "https://github.com/jmberg/ha-openai-compatible",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/adamjs83/ha-openai-compatible/issues",
+  "issue_tracker": "https://github.com/jmberg/ha-openai-compatible/issues",
   "requirements": [
     "openai>=2.45.0"
   ],
