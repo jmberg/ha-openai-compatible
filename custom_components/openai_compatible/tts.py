@@ -189,8 +189,8 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
                 model=options[CONF_CHAT_MODEL],
                 voice=options[ATTR_VOICE],
                 input=message,
-                instructions=str(options.get(CONF_PROMPT)),
-                speed=options.get(CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED),
+#                instructions=str(options.get(CONF_PROMPT)),
+#                speed=options.get(CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED),
                 response_format=codec,
             ) as response:
                 response_data = bytearray()
