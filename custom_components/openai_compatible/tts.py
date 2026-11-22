@@ -266,14 +266,15 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
         options = {**self.subentry.data, **options}
         client = self.entry.runtime_data
 
-        response_format = options[ATTR_PREFERRED_FORMAT]
+        response_format = self.subentry.data.get(
+            CONF_TTS_RESPONSE_FORMAT,
+            DEFAULT_TTS_RESPONSE_FORMAT,
+        )
+
         if response_format in ("ogg", "oga"):
-            codec: Literal["mp3", "opus", "aac", "flac", "wav", "pcm"] = "opus"
+            codec = "opus"
         elif response_format == "raw":
             response_format = codec = "pcm"
-        elif response_format not in self._supported_formats:
-            response_format = self.default_options[ATTR_PREFERRED_FORMAT]
-            codec = response_format
         else:
             codec = response_format
 
