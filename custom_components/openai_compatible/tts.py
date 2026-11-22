@@ -7,6 +7,7 @@ from urllib.parse import urlsplit, urlunsplit
 from httpx import HTTPError
 
 from openai import OpenAIError
+from openai.resources import audio
 from propcache.api import cached_property
 
 from homeassistant.components.tts import (
