@@ -211,7 +211,14 @@ def _convert_content_to_param(
                 role = "developer"
             messages.append(
                 EasyInputMessageParam(
-                    type="message", role=role, content=content.content
+                    type="message",
+                    role=role,
+                    content=[
+                        ResponseInputTextParam(
+                            type="input_text",
+                            text=content.content,
+                        )
+                    ],
                 )
             )
 
