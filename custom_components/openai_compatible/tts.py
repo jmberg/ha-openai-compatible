@@ -131,6 +131,20 @@ async def async_setup_entry(
             config_subentry_id=subentry.subentry_id,
         )
 
+def _normalize_language(language: str) -> str:
+    """Convert Home Assistant language codes to ZONOS3 codes."""
+    language = language.lower().replace("-", "_")
+
+    mapping = {
+        "de_de": "de",
+        "en": "en_gb",
+        "fr": "fr_fr",
+        "pt": "pt_br",
+        "zh": "cmn",
+    }
+
+    return mapping.get(language, language)
+
 class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
     """OpenAI TTS entity."""
 
@@ -291,6 +305,9 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
 #                instructions=str(options.get(CONF_PROMPT)),
 #                speed=options.get(CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED),
                 response_format=codec,
+                extra_body={
+                    "language": _normalize_language(language),
+                },
             ) as response:
                 response_data = bytearray()
                 async for chunk in response.iter_bytes():
