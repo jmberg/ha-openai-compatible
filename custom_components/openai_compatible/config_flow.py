@@ -58,6 +58,9 @@ from .const import (
     CONF_TEMPERATURE,
     CONF_TOP_P,
     CONF_TTS_SPEED,
+    CONF_TTS_RESPONSE_FORMAT,
+    DEFAULT_TTS_RESPONSE_FORMAT,
+    SUPPORTED_TTS_RESPONSE_FORMATS,
     CONF_VERBOSITY,
     CONF_WEB_SEARCH,
     CONF_WEB_SEARCH_CITY,
@@ -793,6 +796,17 @@ class OpenAISubentrySTTFlowHandler(ConfigSubentryFlow):
                     CONF_CHAT_MODEL, default=RECOMMENDED_STT_MODEL
                 ): model_field(
                     await async_fetch_model_ids(self._get_entry().runtime_data)
+                ),
+                vol.Optional(
+                    default=options.get(
+                        CONF_TTS_RESPONSE_FORMAT,
+                        DEFAULT_TTS_RESPONSE_FORMAT,
+                    ),
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=SUPPORTED_TTS_RESPONSE_FORMATS,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
                 ),
             }
         )

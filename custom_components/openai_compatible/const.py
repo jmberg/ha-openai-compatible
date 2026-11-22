@@ -18,6 +18,7 @@ DEFAULT_AI_TASK_NAME = "OpenAI AI Task"
 DEFAULT_STT_NAME = "OpenAI STT"
 DEFAULT_TTS_NAME = "OpenAI TTS"
 DEFAULT_NAME = "OpenAI Conversation"
+DEFAULT_TTS_RESPONSE_FORMAT = "mp3"
 
 CONF_CHAT_MODEL = "chat_model"
 CONF_IMAGE_MODEL = "image_model"
@@ -42,6 +43,7 @@ CONF_WEB_SEARCH_REGION = "region"
 CONF_WEB_SEARCH_COUNTRY = "country"
 CONF_WEB_SEARCH_TIMEZONE = "timezone"
 CONF_WEB_SEARCH_INLINE_CITATIONS = "inline_citations"
+CONF_TTS_RESPONSE_FORMAT = "tts_response_format"
 RECOMMENDED_CODE_INTERPRETER = False
 RECOMMENDED_CHAT_MODEL = "gpt-4o-mini"
 RECOMMENDED_IMAGE_MODEL = "gpt-image-2"
@@ -63,6 +65,15 @@ RECOMMENDED_WEB_SEARCH_INLINE_CITATIONS = False
 DEFAULT_STT_PROMPT = (
     "The following conversation is a smart home user talking to Home Assistant."
 )
+
+SUPPORTED_TTS_RESPONSE_FORMATS = [
+    "mp3",
+    "opus",
+    "aac",
+    "flac",
+    "wav",
+    "pcm",
+]
 
 UNSUPPORTED_MODELS: list[str] = [
     "o1-mini",
