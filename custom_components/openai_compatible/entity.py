@@ -695,6 +695,9 @@ class OpenAIBaseLLMEntity(Entity):
         # To prevent infinite loops, we limit the number of iterations
         for _iteration in range(max_iterations):
             try:
+                for item in model_args["input"]:
+                    if item.get("type") == "reasoning" and "content" not in item:
+                        item["content"] = []
                 LOGGER.warning(
                     "OpenAI input structure: %s",
                     [
