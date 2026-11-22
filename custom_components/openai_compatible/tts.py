@@ -3,6 +3,8 @@
 from collections.abc import Mapping
 import logging
 from typing import TYPE_CHECKING, Any, Literal, override
+from urllib.parse import urlsplit, urlunsplit
+from httpx import HTTPError
 
 from openai import OpenAIError
 from propcache.api import cached_property
@@ -15,12 +17,23 @@ from homeassistant.components.tts import (
     Voice,
 )
 from homeassistant.config_entries import ConfigSubentry
+from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.const import CONF_PROMPT
+from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .const import CONF_CHAT_MODEL, CONF_TTS_SPEED, RECOMMENDED_TTS_SPEED, DEFAULT_TTS_RESPONSE_FORMAT, CONF_TTS_RESPONSE_FORMAT
+from .const import (
+    CONF_CHAT_MODEL,
+    CONF_TTS_SPEED,
+    RECOMMENDED_TTS_SPEED,
+    DEFAULT_TTS_RESPONSE_FORMAT,
+    CONF_TTS_RESPONSE_FORMAT,
+    CONF_BASE_URL,
+    CONF_TTS_BASE_URL,
+    PLACEHOLDER_API_KEY,
+)
 from .entity import OpenAIBaseLLMEntity
 
 if TYPE_CHECKING:
@@ -31,21 +44,91 @@ _LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES = 0
 
 
+def _get_speakers_url(base_url: str) -> str:
+    """Build the speaker discovery URL from the configured API URL."""
+    parsed = urlsplit(base_url.rstrip("/"))
+    path = parsed.path.rstrip("/")
+
+    if path.endswith("/v1"):
+        path = path[:-3]
+
+    return urlunsplit(
+        (
+            parsed.scheme,
+            parsed.netloc,
+            f"{path}/v2/speakers",
+            "",
+            "",
+        )
+    )
+
+
+async def _async_get_supported_voices(
+    hass: HomeAssistant,
+    base_url: str,
+    tts_base_url: str | None,
+    api_key: str | None,
+) -> list[Voice] | None:
+    """Discover supported voices from an OpenAI-compatible TTS server."""
+    url = _get_speakers_url(tts_base_url or base_url)
+    headers = {}
+
+    if api_key and api_key != PLACEHOLDER_API_KEY:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    try:
+        session = get_async_client(hass)
+        response = await session.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+
+        speakers = response.json().get("speakers", [])
+
+        voices = [
+            Voice(speaker["id"], speaker["label"])
+            for speaker in speakers
+            if isinstance(speaker, dict)
+            and isinstance(speaker.get("id"), str)
+            and isinstance(speaker.get("label"), str)
+        ]
+
+        if voices:
+            _LOGGER.info("Discovered %d TTS voices", len(voices))
+            return voices
+
+    except (HTTPError, ValueError, TypeError, AttributeError):
+        _LOGGER.debug("TTS voice discovery failed for %s", url, exc_info=True)
+
+    return None
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: OpenAIConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up TTS entities."""
+
     for subentry in config_entry.subentries.values():
         if subentry.subentry_type != "tts":
             continue
 
-        async_add_entities(
-            [OpenAITTSEntity(config_entry, subentry)],
-            config_subentry_id=subentry.subentry_id,
+        supported_voices = await _async_get_supported_voices(
+            hass,
+            config_entry.data[CONF_BASE_URL],
+            subentry.data.get(CONF_TTS_BASE_URL),
+            config_entry.data.get(CONF_API_KEY),
         )
 
+        async_add_entities(
+            [
+                OpenAITTSEntity(
+                    config_entry,
+                    subentry,
+                    supported_voices,
+                )
+            ],
+            config_subentry_id=subentry.subentry_id,
+        )
 
 class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
     """OpenAI TTS entity."""
@@ -118,7 +201,7 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
     _attr_default_language = "en-US"
 
     # https://platform.openai.com/docs/guides/text-to-speech#voice-options
-    _supported_voices = [
+    _default_supported_voices = [
         Voice(voice.lower(), voice)
         for voice in (
             "Marin",
@@ -141,10 +224,19 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
 
     _attr_has_entity_name = False
 
-    def __init__(self, entry: OpenAIConfigEntry, subentry: ConfigSubentry) -> None:
+    def __init__(
+        self,
+        entry: OpenAIConfigEntry,
+        subentry: ConfigSubentry,
+        supported_voices: list[Voice] | None = None,
+    ) -> None:
         """Initialize the entity."""
         super().__init__(entry, subentry)
+
         self._attr_name = subentry.title
+        self._supported_voices = (
+            supported_voices or self._default_supported_voices
+        )
 
     @callback
     @override

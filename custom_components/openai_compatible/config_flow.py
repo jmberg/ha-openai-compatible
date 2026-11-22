@@ -76,6 +76,7 @@ from .const import (
     DEFAULT_STT_NAME,
     DEFAULT_STT_PROMPT,
     DEFAULT_TTS_NAME,
+    CONF_TTS_BASE_URL,
     DOMAIN,
     PLACEHOLDER_API_KEY,
     RECOMMENDED_AI_TASK_OPTIONS,
@@ -892,6 +893,10 @@ class OpenAISubentryTTSFlowHandler(ConfigSubentryFlow):
                         mode=SelectSelectorMode.DROPDOWN,
                     )
                 ),
+                vol.Optional(
+                    CONF_TTS_BASE_URL,
+                    default=options.get(CONF_TTS_BASE_URL, ""),
+                ): str,
             }
         )
 
