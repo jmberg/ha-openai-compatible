@@ -693,24 +693,17 @@ class OpenAIBaseLLMEntity(Entity):
         client = self.entry.runtime_data
 
         def _sanitize_response_input(messages: ResponseInputParam) -> ResponseInputParam:
-            """Remove invalid empty message items."""
-            sanitized = []
-
             for message in messages:
-                if message.get("type") in ("message", "reasoning"):
+                if message.get("type") in ("message",):
                     content = message.get("content")
 
                     if not content or not isinstance(content, list):
                         message['content'] = ['<nothing>']
 
-                sanitized.append(message)
-
-            return sanitized
-
         # To prevent infinite loops, we limit the number of iterations
         for _iteration in range(max_iterations):
             try:
-                model_args["input"] = _sanitize_response_input(model_args["input"])
+                _sanitize_response_input(model_args["input"])
                 LOGGER.debug(
                     "OpenAI input structure: %s",
                     [
