@@ -710,7 +710,7 @@ class OpenAIBaseLLMEntity(Entity):
         # To prevent infinite loops, we limit the number of iterations
         for _iteration in range(max_iterations):
             try:
-                _sanitize_response_input(model_args["input"])
+                model_args["input"] = _sanitize_response_input(model_args["input"])
                 LOGGER.debug(
                     "OpenAI input structure: %s",
                     [
