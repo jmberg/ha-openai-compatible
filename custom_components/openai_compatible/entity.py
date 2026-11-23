@@ -296,7 +296,7 @@ async def _transform_stream(  # noqa: C901 - This is complex, but better to have
     citation_regexp = re.compile(r"\(\[([^\]]+)\]\((https?:\/\/[^\)]+)\)")
 
     async for event in stream:
-        LOGGER.debug("Received event: %s", event)
+#        LOGGER.debug("Received event: %s", event)
 
         if isinstance(event, ResponseOutputItemAddedEvent):
             if isinstance(event.item, ResponseFunctionToolCall):
