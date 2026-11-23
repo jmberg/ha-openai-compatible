@@ -701,7 +701,7 @@ class OpenAIBaseLLMEntity(Entity):
                     content = message.get("content")
 
                     if not content or not isinstance(content, list):
-                        continue
+                        message['content'] = ['<nothing>']
 
                 sanitized.append(message)
 
