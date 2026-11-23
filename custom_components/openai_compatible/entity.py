@@ -698,7 +698,7 @@ class OpenAIBaseLLMEntity(Entity):
                 for item in model_args["input"]:
                     if item.get("type") == "reasoning" and "content" not in item:
                         item["content"] = []
-                LOGGER.warning(
+                LOGGER.debug(
                     "OpenAI input structure: %s",
                     [
                         {

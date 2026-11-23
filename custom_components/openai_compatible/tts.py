@@ -292,11 +292,6 @@ class OpenAITTSEntity(TextToSpeechEntity, OpenAIBaseLLMEntity):
         else:
             codec = response_format
 
-        _LOGGER.warning(
-            "TTS DEBUG: codec=%s, options=%s",
-            codec,
-            options,
-        )
         try:
             async with client.audio.speech.with_streaming_response.create(
                 model=options[CONF_CHAT_MODEL],
