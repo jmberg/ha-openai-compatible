@@ -250,24 +250,24 @@ def _convert_content_to_param(
                 reasoning_summary.append(content.thinking_content)
 
             if isinstance(content.native, ResponseReasoningItem):
-                messages.append(
-                    ResponseReasoningItemParam(
-                        type="reasoning",
-                        id=content.native.id,
-                        summary=(
-                            [
-                                {
-                                    "type": "summary_text",
-                                    "text": summary,
-                                }
-                                for summary in reasoning_summary
-                            ]
-                            if content.thinking_content
-                            else []
-                        ),
-                        encrypted_content=content.native.encrypted_content,
-                    )
-                )
+#                messages.append(
+#                    ResponseReasoningItemParam(
+#                        type="reasoning",
+#                        id=content.native.id,
+#                        summary=(
+#                            [
+#                                {
+#                                    "type": "summary_text",
+#                                    "text": summary,
+#                                }
+#                                for summary in reasoning_summary
+#                            ]
+#                            if content.thinking_content
+#                            else []
+#                        ),
+#                        encrypted_content=content.native.encrypted_content,
+#                    )
+#                )
                 reasoning_summary = []
             elif isinstance(content.native, ImageGenerationCall):
                 messages.append(
